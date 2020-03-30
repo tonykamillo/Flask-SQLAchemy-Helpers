@@ -27,7 +27,6 @@ setup(
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
-        'License :: DON\'T BE A DICK PUBLIC LICENSE',
         'Operating System :: OS Independent',
         'Programming Language :: Python',        
     ]
