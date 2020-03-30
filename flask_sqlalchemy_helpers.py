@@ -85,5 +85,7 @@ class SQLAlchemyDRY(_SQLAlchemy):
 
         super(SQLAlchemyDRY, self).__init__(*args, **kwargs)
 
-        self.m2m = lambda t1, t2: m2m(db, t1, t2)
         self.UUID = UUID
+        
+    def m2m(self, t1, t2):
+        return m2m(self, t1, t2)
