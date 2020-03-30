@@ -8,7 +8,7 @@ from setuptools import setup
 
 setup(
     name='Flask-SQLAlchemy-Helpers',
-    version='1.',
+    version='1.1',
     url='https://github.com/tonykamillo/Flask-SQLAchemy-Helpers',
     license='BSD',
     author='Tony Kamillo',
