@@ -1,6 +1,7 @@
 import uuid
+from datetime import datetime
 import sqlalchemy.types as types
-from sqlalchemy import Column, ForeignKey, String
+from sqlalchemy import Column, ForeignKey, String, DateTime
 from flask_sqlalchemy import SQLAlchemy as _SQLAlchemy, BaseQuery, Model as SAModel
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -48,6 +49,7 @@ class JoinedInheritanceMixin:
 
     @declared_attr
     def __mapper_args__(cls):
+
         indentity = cls.__name__.lower()
         mapper_args = {'polymorphic_identity': indentity}
 
@@ -70,6 +72,21 @@ class ModelUUID(SAModel):
             kwargs.update(default=uuid.uuid4)
         return Column(*args, **kwargs)
 
+    @declared_attr
+    def created_at(cls):
+        return Column(DateTime, default=datetime.now, nullable=False, index=True)
+
+    @declared_attr
+    def __mapper_args__(cls):
+        mapper = {
+            'order_by': cls.created_at
+        }
+        classes = (cls,) + cls.__bases__
+        for c in classes:
+            if hasattr(c, '__mapper_args__'):
+                mapper.update(c.__mapper_args__)
+        return mapper
+
 
 class Query(BaseQuery):
 
@@ -86,6 +103,6 @@ class SQLAlchemyDRY(_SQLAlchemy):
         super(SQLAlchemyDRY, self).__init__(*args, **kwargs)
 
         self.UUID = UUID
-        
+
     def m2m(self, t1, t2):
         return m2m(self, t1, t2)
