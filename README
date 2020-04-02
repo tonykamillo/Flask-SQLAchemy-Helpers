@@ -30,6 +30,7 @@ To explain how to use a lib, nothing is better than a complete example. The comm
     # If your want to implement Joined Inheritance just make your Base model inherits from JoinedInheritanceMixin and db.Model, otherwise just inherit from db.Model
     class Base(JoinedInheritanceMixin, db.Model):
         name = db.Column(db.String(100), nullable=False, index=True)
+        created_at = db.Column(db.DateTime, default=datetime.now, nullable=False, index=True)
         updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False, index=True)
 
         def __repr__(self):

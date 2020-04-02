@@ -1,9 +1,11 @@
 import uuid
 from datetime import datetime
+
 import sqlalchemy.types as types
-from sqlalchemy import Column, ForeignKey, String, DateTime
-from flask_sqlalchemy import SQLAlchemy as _SQLAlchemy, BaseQuery, Model as SAModel
+from sqlalchemy import Column, ForeignKey, String, DateTime, Integer
 from sqlalchemy.ext.declarative import declared_attr
+
+from flask_sqlalchemy import SQLAlchemy as _SQLAlchemy, BaseQuery, Model as SAModel
 
 
 def m2m(db, table1, table2):
@@ -25,8 +27,8 @@ def m2m(db, table1, table2):
 
     return db.Table(
         table_name,
-        db.Column(field1, UUID, db.ForeignKey(f_key1), primary_key=True),
-        db.Column(field2, UUID, db.ForeignKey(f_key2), primary_key=True)
+        db.Column(field1, UUID, db.ForeignKey(f_key1)),
+        db.Column(field2, UUID, db.ForeignKey(f_key2))
     )
 
 
@@ -35,10 +37,14 @@ class UUID(types.TypeDecorator):
     impl = types.String
 
     def process_bind_param(self, value, dialect):
-        return str(value)
+        if value:
+            value = str(value)
+        return value
 
-    def copy(self, **kwargs):
-        return UUID(36)
+    def process_result_value(self, value, dialect):
+        if value and not isinstance(value, uuid.UUID):
+            value = uuid.UUID(value)
+        return value
 
 
 class JoinedInheritanceMixin:
@@ -71,21 +77,6 @@ class ModelUUID(SAModel):
         else:
             kwargs.update(default=uuid.uuid4)
         return Column(*args, **kwargs)
-
-    @declared_attr
-    def created_at(cls):
-        return Column(DateTime, default=datetime.now, nullable=False, index=True)
-
-    @declared_attr
-    def __mapper_args__(cls):
-        mapper = {
-            'order_by': cls.created_at
-        }
-        classes = (cls,) + cls.__bases__
-        for c in classes:
-            if hasattr(c, '__mapper_args__'):
-                mapper.update(c.__mapper_args__)
-        return mapper
 
 
 class Query(BaseQuery):
